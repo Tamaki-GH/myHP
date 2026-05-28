@@ -84,18 +84,8 @@ class ChatServlet < WEBrick::HTTPServlet::AbstractServlet
     })
 
     res  = http.request(req)
-    begin
-      body = JSON.parse(res.body)
-    rescue JSON::ParserError
-      raise "APIからのレスポンスがJSONではありませんでした: #{res.body[0..200]}"
-    end
-
-    if res.code == '200'
-      body.dig('content', 0, 'text') || '（返答を取得できませんでした）'
-    else
-      raise body.dig('error', 'message') || "Claude API エラー (HTTP #{res.code})"
-    end
-  end
+　　"HTTP #{res.code}\n\nHeaders:\n#{res.to_hash.inspect}\n\nBody:\n#{res.body[0..500]}"
+　end
 
   # システムプロンプト — 玉置彩奈のアシスタントとして振る舞う
   def system_prompt
