@@ -114,8 +114,14 @@ class ChatServlet < WEBrick::HTTPServlet::AbstractServlet
       3. 需要予測モデル（LSTM / Transformer / Prophet）— MAPE 8.2%
       4. 音声感情分析 API（Whisper + Fine-tuning / Kubernetes）
 
-      【連絡先】
-      お問い合わせは ayumi@example.com へご案内ください。
+      【営業時間・連絡先】
+      - 営業時間: 9:00〜19:00
+      - 電話番号: 090-1234-5678
+      - メールアドレス: ayana.t@gmail.com
+
+      【よくある質問と回答】
+      Q: どんな仕事・作業が得意ですか？
+      A: チャットボットの開発が得意です。
 
       ポートフォリオサイト以外の話題（政治・有害なコンテンツ等）は丁重にお断りし、
       「彩奈のスキルや実績についてお気軽にどうぞ！」と案内してください。
