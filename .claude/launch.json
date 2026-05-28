@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "myHP",
+      "runtimeExecutable": "ruby",
+      "runtimeArgs": ["/Users/tamaki/Desktop/myHP/serve.rb"],
+      "port": 3000
+    }
+  ]
+}

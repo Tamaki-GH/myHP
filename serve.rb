@@ -84,7 +84,11 @@ class ChatServlet < WEBrick::HTTPServlet::AbstractServlet
     })
 
     res  = http.request(req)
-    body = JSON.parse(res.body)
+    begin
+      body = JSON.parse(res.body)
+    rescue JSON::ParserError
+      raise "APIからのレスポンスがJSONではありませんでした: #{res.body[0..200]}"
+    end
 
     if res.code == '200'
       body.dig('content', 0, 'text') || '（返答を取得できませんでした）'
