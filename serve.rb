@@ -1,7 +1,133 @@
 require 'webrick'
+require 'net/http'
+require 'json'
+require 'uri'
+
+# ── チャットAPIサーブレット ──────────────────────────────────────────────
+class ChatServlet < WEBrick::HTTPServlet::AbstractServlet
+
+  # CORS プリフライトリクエスト対応
+  def do_OPTIONS(request, response)
+    set_cors_headers(response)
+    response.status = 204
+  end
+
+  # POST /api/chat — フロントエンドからのメッセージを受け取り Claude に問い合わせる
+  def do_POST(request, response)
+    set_cors_headers(response)
+    response['Content-Type'] = 'application/json; charset=utf-8'
+
+    # APIキーを環境変数から取得（HTMLには絶対に書かない）
+    api_key = ENV['ANTHROPIC_API_KEY']
+    unless api_key
+      response.status = 500
+      response.body = JSON.generate({ error: 'ANTHROPIC_API_KEY が設定されていません。起動前に export ANTHROPIC_API_KEY=... を実行してください。' })
+      return
+    end
+
+    # リクエストボディをパース
+    body = JSON.parse(request.body)
+    messages = body['messages'] || []
+
+    # Claude API を呼び出して返答を取得
+    reply = call_claude(api_key, messages)
+    response.body = JSON.generate({ content: reply })
+
+  rescue JSON::ParserError
+    response.status = 400
+    response.body = JSON.generate({ error: 'リクエストの JSON 形式が正しくありません' })
+  rescue => e
+    response.status = 500
+    response.body = JSON.generate({ error: e.message })
+  end
+
+  private
+
+  # CORS ヘッダーをセット
+  def set_cors_headers(response)
+    response['Access-Control-Allow-Origin']  = '*'
+    response['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
+    response['Access-Control-Allow-Headers'] = 'Content-Type'
+  end
+
+  # Claude API (claude-haiku-4-5) を呼び出す
+  def call_claude(api_key, messages)
+    uri  = URI('https://api.anthropic.com/v1/messages')
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl    = true
+    http.read_timeout = 60
+
+    req = Net::HTTP::Post.new(uri)
+    req['Content-Type']      = 'application/json'
+    req['x-api-key']         = api_key
+    req['anthropic-version'] = '2023-06-01'
+    req.body = JSON.generate({
+      model:      'claude-haiku-4-5',
+      max_tokens: 1024,
+      system:     system_prompt,
+      messages:   messages
+    })
+
+    res  = http.request(req)
+    body = JSON.parse(res.body)
+
+    if res.code == '200'
+      body.dig('content', 0, 'text') || '（返答を取得できませんでした）'
+    else
+      raise body.dig('error', 'message') || "Claude API エラー (HTTP #{res.code})"
+    end
+  end
+
+  # システムプロンプト — 玉置彩奈のアシスタントとして振る舞う
+  def system_prompt
+    <<~PROMPT
+      あなたは玉置 彩奈（Ayana Tamaki）のポートフォリオサイトの AI アシスタントです。
+      訪問者からの質問に、日本語で親しみやすく・簡潔に答えてください。
+      長い説明が必要な場合でも、300文字以内を目安にまとめてください。
+
+      【プロフィール】
+      - 名前: 玉置 彩奈（Ayana Tamaki）
+      - 職種: AI エンジニア / ML リサーチャー
+      - 専門: LLM プロダクト開発、RAG、Fine-tuning、MLOps 基盤設計
+
+      【スキル】
+      Python, PyTorch, LangChain, RAG, Fine-tuning, FastAPI, Docker, AWS, GCP, Kubernetes, MLflow, React
+
+      【主な実績】
+      1. 社内チャットボット構築（RAG / LangChain / Azure）— 問い合わせ工数 40% 削減
+      2. 画像異常検知システム（ResNet / GradCAM）— 検出精度 98.5%
+      3. 需要予測モデル（LSTM / Transformer / Prophet）— MAPE 8.2%
+      4. 音声感情分析 API（Whisper + Fine-tuning / Kubernetes）
+
+      【連絡先】
+      お問い合わせは ayumi@example.com へご案内ください。
+
+      ポートフォリオサイト以外の話題（政治・有害なコンテンツ等）は丁重にお断りし、
+      「彩奈のスキルや実績についてお気軽にどうぞ！」と案内してください。
+    PROMPT
+  end
+end
+
+# ── Web サーバー設定 ──────────────────────────────────────────────────
 server = WEBrick::HTTPServer.new(
-  Port: 3000,
-  DocumentRoot: '/Users/tamaki/Desktop/myHP'
+  Port:        3000,
+  DocumentRoot: '/Users/tamaki/Desktop/myHP',
+  MaxClients:  10,
+  Logger:       WEBrick::Log.new($stdout, WEBrick::Log::INFO),
+  AccessLog:   [[
+    $stdout,
+    WEBrick::AccessLog::COMBINED_LOG_FORMAT
+  ]]
 )
-trap('INT') { server.shutdown }
+
+# /api/chat エンドポイントをマウント
+server.mount('/api/chat', ChatServlet)
+
+trap('INT')  { server.shutdown }
+trap('TERM') { server.shutdown }
+
+puts "🚀 サーバー起動: http://localhost:3000"
+puts "💬 チャット API:  http://localhost:3000/api/chat"
+puts "⌨️  停止するには Ctrl+C"
+
 server.start
