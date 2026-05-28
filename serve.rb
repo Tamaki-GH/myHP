@@ -45,16 +45,27 @@ class ChatServlet < WEBrick::HTTPServlet::AbstractServlet
     messages = body['messages'] || []
 
     # Claude API を呼び出して返答を取得
-    reply = call_claude(api_key, messages)
-    response.body = JSON.generate({ content: reply })
+def call_claude(api_key, messages)
+  uri  = URI('https://api.anthropic.com/v1/messages')
+  http = Net::HTTP.new(uri.host, uri.port)
+  http.use_ssl       = true
+  http.read_timeout  = 60
 
-  rescue JSON::ParserError
-    response.status = 400
-    response.body = JSON.generate({ error: 'リクエストの JSON 形式が正しくありません' })
-  rescue => e
-    response.status = 500
-    response.body = JSON.generate({ error: e.message })
-  end
+  req = Net::HTTP::Post.new(uri)
+  req['Content-Type']      = 'application/json'
+  req['x-api-key']         = api_key
+  req['anthropic-version'] = '2023-06-01'
+  req.body = JSON.generate({
+    model:      'claude-haiku-4-5,
+    max_tokens: 1024,
+    system:     system_prompt,
+    messages:   messages
+  })
+
+  res = http.request(req)
+
+  "HTTP #{res.code}\n\nHeaders:\n#{res.to_hash.inspect}\n\nBody:\n#{res.body[0..500]}"
+end
 
   private
 
