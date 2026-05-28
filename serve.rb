@@ -3,6 +3,21 @@ require 'net/http'
 require 'json'
 require 'uri'
 
+# ── .env ファイルの自動読み込み ────────────────────────────────────────
+# 外部 gem 不要のシンプルな実装。
+# 環境変数が既に設定されている場合は上書きしない（export が優先される）。
+env_path = File.join(__dir__, '.env')
+if File.exist?(env_path)
+  File.foreach(env_path) do |line|
+    line = line.strip
+    next if line.empty? || line.start_with?('#')  # 空行・コメントをスキップ
+    key, value = line.split('=', 2)
+    next unless key && value
+    ENV[key] ||= value  # 既に設定済みの環境変数は上書きしない
+  end
+  puts "📄 .env を読み込みました"
+end
+
 # ── チャットAPIサーブレット ──────────────────────────────────────────────
 class ChatServlet < WEBrick::HTTPServlet::AbstractServlet
 
