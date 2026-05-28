@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>玉置 彩奈 | AI エンジニア</title>
+  <!-- 高級感のあるセリフ体フォント -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Noto+Serif+JP:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── カラーシステム ── */
+    :root {
+      --bg:      #0f0f1a;
+      --surface: #1a1a2e;
+      --border:  #2a2a45;
+      --accent:  #8b5cf6;
+      --accent2: #22d3ee;
+      --accent3: #f472b6;
+      --text:    #f0f4ff;
+      --muted:   #7a86a8;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* 全画面グラデーション背景 */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 55% at 15% 15%, rgba(139,92,246,.22) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 85% 85%, rgba(34,211,238,.18) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 50% 100%, rgba(244,114,182,.12) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* フローティングパーティクル */
+    .particle {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      animation: float linear infinite;
+      opacity: .2;
+    }
+    .particle:nth-child(1) { width:4px; height:4px; background:var(--accent2); left:10%; top:20%; animation-duration:18s; }
+    .particle:nth-child(2) { width:3px; height:3px; background:var(--accent3); left:80%; top:60%; animation-duration:22s; animation-delay:-6s; }
+    .particle:nth-child(3) { width:5px; height:5px; background:var(--accent);  left:60%; top:10%; animation-duration:26s; animation-delay:-10s; }
+    .particle:nth-child(4) { width:3px; height:3px; background:var(--accent2); left:30%; top:80%; animation-duration:20s; animation-delay:-3s; }
+
+    @keyframes float {
+      0%   { transform: translateY(0) rotate(0deg); }
+      50%  { transform: translateY(-30px) rotate(180deg); }
+      100% { transform: translateY(0) rotate(360deg); }
+    }
+
+    /* ══════════════════════════════════════
+       ヘッダーナビゲーション
+    ══════════════════════════════════════ */
+    .site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 1.4rem 0;
+      transition: background .35s, backdrop-filter .35s, border-color .35s, padding .35s;
+      border-bottom: 1px solid transparent;
+    }
+
+    /* スクロール後: 半透明ガラス効果 */
+    .site-header.scrolled {
+      padding: 1rem 0;
+      background: rgba(15,15,26,.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-color: rgba(42,42,69,.6);
+    }
+
+    .header-inner {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 0 clamp(1.5rem, 5vw, 3.5rem);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* ロゴ */
+    .header-logo {
+      font-family: 'Cormorant Garamond', 'Noto Serif JP', serif;
+      font-size: clamp(1.1rem, 2vw, 1.35rem);
+      font-weight: 400;
+      letter-spacing: .06em;
+      color: var(--text);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .header-logo:hover { color: var(--accent2); }
+
+    /* ナビリンク */
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: clamp(1.5rem, 3vw, 2.5rem);
+    }
+
+    .nav-link {
+      position: relative;
+      font-size: .82rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      padding-bottom: .2rem;
+      transition: color .2s;
+    }
+
+    /* シアンのアンダーラインスライドイン */
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: var(--accent2);
+      transition: width .25s ease;
+    }
+    .nav-link:hover { color: var(--text); }
+    .nav-link:hover::after { width: 100%; }
+
+    /* ハンバーガー（モバイル用） */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .hamburger span {
+      display: block;
+      width: 22px;
+      height: 1.5px;
+      background: var(--muted);
+      border-radius: 2px;
+      transition: all .25s;
+    }
+
+    /* ══════════════════════════════════════
+       Hero セクション
+    ══════════════════════════════════════ */
+    #hero {
+      position: relative;
+      z-index: 1;
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      padding: 0 clamp(1.5rem, 5vw, 3.5rem);
+    }
+
+    .hero-inner {
+      max-width: 1160px;
+      margin: 0 auto;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    /* ヒーロー左: テキスト */
+    .hero-text { order: 1; }
+
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: .72rem;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 1.4rem;
+      opacity: 0;
+      animation: fadeUp .8s .2s ease forwards;
+    }
+
+    .hero-title {
+      font-family: 'Cormorant Garamond', 'Noto Serif JP', serif;
+      font-size: clamp(3rem, 7vw, 5.5rem);
+      font-weight: 300;
+      line-height: 1.12;
+      letter-spacing: -.01em;
+      margin-bottom: 1.6rem;
+      opacity: 0;
+      animation: fadeUp .8s .4s ease forwards;
+    }
+
+    .hero-title .gradient-text {
+      background: linear-gradient(120deg, #f0f4ff 10%, var(--accent2) 60%, var(--accent3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-desc {
+      font-size: clamp(.95rem, 1.5vw, 1.05rem);
+      line-height: 1.9;
+      color: #b0bcdc;
+      max-width: 440px;
+      margin-bottom: 2.5rem;
+      opacity: 0;
+      animation: fadeUp .8s .6s ease forwards;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp .8s .8s ease forwards;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ヒーロー右: アバター */
+    .hero-avatar {
+      order: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      opacity: 0;
+      animation: fadeIn .9s .5s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(.96); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    /* ステータスバッジ */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .45rem;
+      background: rgba(139,92,246,.18);
+      border: 1px solid rgba(139,92,246,.45);
+      border-radius: 99px;
+      padding: .4rem 1.2rem;
+      font-size: .85rem;
+      color: #c4b5fd;
+    }
+
+    .badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent2);
+      box-shadow: 0 0 6px var(--accent2);
+      animation: blink 2s ease-in-out infinite;
+    }
+
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    /* アバターリング（既存デザイン継続） */
+    .avatar-ring {
+      position: relative;
+      width: clamp(140px, 22vw, 200px);
+      height: clamp(140px, 22vw, 200px);
+    }
+
+    .avatar-ring::before {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      background: conic-gradient(var(--accent), var(--accent2), var(--accent3), var(--accent));
+      z-index: -1;
+      filter: blur(6px);
+      opacity: .85;
+      animation: spin 6s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .avatar-ring::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      background: conic-gradient(var(--accent), var(--accent2), var(--accent3), var(--accent));
+      z-index: 0;
+      animation: spin 6s linear infinite;
+    }
+
+    .avatar-inner {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 4px solid #ffffff;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .avatar-inner svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* 英字名 */
+    .hero-name-en {
+      font-size: .78rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ══════════════════════════════════════
+       ボタンコンポーネント
+    ══════════════════════════════════════ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .78rem 1.8rem;
+      border-radius: 12px;
+      font-size: .88rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform .15s, box-shadow .15s, background .15s, border-color .15s;
+      cursor: pointer;
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #7c3aed);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(139,92,246,.45);
+    }
+    .btn-primary:hover { box-shadow: 0 8px 30px rgba(139,92,246,.65); }
+
+    .btn-secondary {
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.12);
+      color: var(--text);
+    }
+    .btn-secondary:hover {
+      background: rgba(34,211,238,.08);
+      border-color: var(--accent2);
+      color: var(--accent2);
+    }
+
+    /* ══════════════════════════════════════
+       セクション共通スタイル
+    ══════════════════════════════════════ */
+    .section {
+      position: relative;
+      z-index: 1;
+      padding: clamp(5rem, 10vw, 8rem) clamp(1.5rem, 5vw, 3.5rem);
+    }
+
+    .section-wrap {
+      max-width: 1160px;
+      margin: 0 auto;
+    }
+
+    /* LV スタイルのセクション見出し */
+    .section-header {
+      margin-bottom: clamp(3rem, 6vw, 5rem);
+    }
+
+    .section-eyebrow {
+      display: block;
+      font-size: .7rem;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: .9rem;
+    }
+
+    .section-title {
+      font-family: 'Cormorant Garamond', 'Noto Serif JP', serif;
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      font-weight: 300;
+      letter-spacing: -.01em;
+      line-height: 1.15;
+    }
+
+    .section-divider {
+      width: 48px;
+      height: 1px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      margin-top: 1.2rem;
+    }
+
+    /* スクロールフェードイン */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity .65s ease, transform .65s ease;
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ══════════════════════════════════════
+       About セクション
+    ══════════════════════════════════════ */
+    #about {
+      border-top: 1px solid rgba(42,42,69,.5);
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(3rem, 6vw, 6rem);
+      align-items: start;
+    }
+
+    .about-bio {
+      font-size: 1rem;
+      line-height: 2;
+      color: #b0bcdc;
+    }
+
+    .about-bio p + p { margin-top: 1.2em; }
+
+    /* スキルエリア */
+    .skills-title {
+      font-size: .72rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .skills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+      margin-bottom: 2.2rem;
+    }
+
+    .skill {
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 8px;
+      padding: .38rem .95rem;
+      font-size: .82rem;
+      color: #d0daf5;
+      transition: all .2s;
+      cursor: default;
+    }
+
+    .skill:hover {
+      background: rgba(139,92,246,.15);
+      border-color: var(--accent);
+      color: #e0d4ff;
+      transform: translateY(-1px);
+    }
+
+    /* ══════════════════════════════════════
+       Works セクション
+    ══════════════════════════════════════ */
+    #works {
+      border-top: 1px solid rgba(42,42,69,.5);
+    }
+
+    .works-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+
+    /* プロジェクトカード */
+    .work-card {
+      background: rgba(26,26,46,.85);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2rem;
+      backdrop-filter: blur(12px);
+      box-shadow:
+        0 0 0 1px rgba(139,92,246,.1),
+        0 16px 40px rgba(0,0,0,.4);
+      transition: transform .25s, box-shadow .25s, border-color .25s;
+      cursor: default;
+    }
+
+    .work-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(139,92,246,.35);
+      box-shadow:
+        0 0 0 1px rgba(139,92,246,.25),
+        0 0 40px rgba(139,92,246,.12),
+        0 24px 56px rgba(0,0,0,.5);
+    }
+
+    .card-icon {
+      font-size: 1.8rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .card-title {
+      font-family: 'Cormorant Garamond', 'Noto Serif JP', serif;
+      font-size: 1.3rem;
+      font-weight: 400;
+      margin-bottom: .65rem;
+      line-height: 1.3;
+    }
+
+    .card-desc {
+      font-size: .88rem;
+      line-height: 1.8;
+      color: var(--muted);
+      margin-bottom: 1.4rem;
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .4rem;
+    }
+
+    .tag {
+      font-size: .72rem;
+      letter-spacing: .06em;
+      padding: .25rem .7rem;
+      border-radius: 99px;
+      border: 1px solid rgba(34,211,238,.3);
+      color: var(--accent2);
+      background: rgba(34,211,238,.06);
+    }
+
+    /* ══════════════════════════════════════
+       フッター
+    ══════════════════════════════════════ */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid rgba(42,42,69,.5);
+      padding: 3rem clamp(1.5rem, 5vw, 3.5rem) 2rem;
+    }
+
+    .footer-inner {
+      max-width: 1160px;
+      margin: 0 auto;
+    }
+
+    /* SNS セクション */
+    .footer-sns {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.4rem;
+      padding-bottom: 2.5rem;
+      border-bottom: 1px solid rgba(42,42,69,.5);
+      margin-bottom: 1.8rem;
+    }
+
+    .footer-sns-label {
+      font-size: .68rem;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .sns-icons {
+      display: flex;
+      gap: 1.2rem;
+      align-items: center;
+    }
+
+    /* SNSアイコンボタン */
+    .sns-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+      text-decoration: none;
+      transition: transform .2s, background .2s, border-color .2s, box-shadow .2s;
+    }
+
+    .sns-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: var(--muted);
+      transition: fill .2s;
+    }
+
+    /* ホバー: YouTube */
+    .sns-btn.youtube:hover {
+      background: rgba(255,0,0,.12);
+      border-color: rgba(255,0,0,.4);
+      box-shadow: 0 0 18px rgba(255,0,0,.2);
+    }
+    .sns-btn.youtube:hover svg { fill: #ff4444; }
+
+    /* ホバー: X (Twitter) */
+    .sns-btn.x-twitter:hover {
+      background: rgba(255,255,255,.1);
+      border-color: rgba(255,255,255,.3);
+      box-shadow: 0 0 18px rgba(255,255,255,.1);
+    }
+    .sns-btn.x-twitter:hover svg { fill: #f0f4ff; }
+
+    /* ホバー: Instagram */
+    .sns-btn.instagram:hover {
+      background: rgba(225,48,108,.12);
+      border-color: rgba(225,48,108,.4);
+      box-shadow: 0 0 18px rgba(225,48,108,.2);
+    }
+    .sns-btn.instagram:hover svg { fill: #e1306c; }
+
+    .sns-btn:hover { transform: translateY(-3px); }
+
+    /* フッター下段 */
+    .footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-copy {
+      font-size: .78rem;
+      color: var(--muted);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .footer-link {
+      font-size: .78rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .footer-link:hover { color: var(--accent2); }
+
+    /* ══════════════════════════════════════
+       レスポンシブ
+    ══════════════════════════════════════ */
+    @media (max-width: 768px) {
+      /* ヘッダーのナビを非表示 → ハンバーガーへ */
+      .header-nav { display: none; }
+      .hamburger  { display: flex; }
+
+      /* Hero: 縦並び（アバター上） */
+      .hero-inner {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+      .hero-text  { order: 2; }
+      .hero-avatar { order: 1; }
+
+      .hero-desc    { margin-inline: auto; }
+      .hero-actions { justify-content: center; }
+
+      /* About: 縦並び */
+      .about-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      /* Works: 1列 */
+      .works-grid { grid-template-columns: 1fr; }
+
+      .btn {
+        padding: .72rem 1.4rem;
+        font-size: .84rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- パーティクル -->
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+
+  <!-- ════ ヘッダーナビゲーション ════ -->
+  <header class="site-header" id="siteHeader">
+    <div class="header-inner">
+      <a class="header-logo" href="#hero">玉置 彩奈</a>
+      <nav class="header-nav">
+        <a class="nav-link" href="#about">About</a>
+        <a class="nav-link" href="#works">Works</a>
+        <a class="btn btn-primary" href="mailto:ayumi@example.com" style="padding:.55rem 1.3rem; font-size:.82rem;">Contact</a>
+      </nav>
+      <button class="hamburger" id="hamburger" aria-label="メニュー">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ════ Hero セクション ════ -->
+  <section id="hero">
+    <div class="hero-inner">
+
+      <!-- 左: テキスト -->
+      <div class="hero-text">
+        <span class="hero-eyebrow">AI Engineer &amp; ML Researcher</span>
+        <h1 class="hero-title">
+          <span class="gradient-text">玉置&nbsp;彩奈</span><br>
+          <span style="font-size: clamp(1.4rem, 3vw, 2.2rem); font-weight:300; color: var(--muted); letter-spacing:.06em;">Ayana Tamaki</span>
+        </h1>
+        <p class="hero-desc">
+          機械学習・生成 AI の研究開発に携わるエンジニアです。
+          最新の LLM を活用したプロダクト開発から、MLOps 基盤の設計・構築まで幅広く対応しています。
+        </p>
+        <div class="hero-actions">
+          <a href="#works" class="btn btn-primary">実績を見る</a>
+          <a href="#about" class="btn btn-secondary">プロフィール</a>
+        </div>
+      </div>
+
+      <!-- 右: アバター -->
+      <div class="hero-avatar">
+        <div class="avatar-ring">
+          <div class="avatar-inner">
+            <!-- アイコン画像 -->
+            <img src="avatar.png" alt="玉置 彩奈" style="width:100%; height:100%; object-fit:cover; object-position:center top;">
+          </div>
+        </div>
+        <span class="status-badge">
+          <span class="badge-dot"></span>AI エンジニア
+        </span>
+        <span class="hero-name-en">Ayana Tamaki</span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ════ About セクション ════ -->
+  <section id="about" class="section">
+    <div class="section-wrap">
+
+      <div class="section-header fade-in">
+        <span class="section-eyebrow">Profile</span>
+        <h2 class="section-title">自己紹介</h2>
+        <div class="section-divider"></div>
+      </div>
+
+      <div class="about-grid">
+
+        <div class="about-bio fade-in">
+          <p>
+            大学院で自然言語処理を専攻後、AI スタートアップにて研究エンジニアとして従事。
+            現在は LLM を活用したプロダクト開発を中心に、RAG・Fine-tuning・MLOps 基盤の設計まで幅広く担当しています。
+          </p>
+          <p>
+            「技術の力で、人の創造性を解放する」をモットーに、エンジニアリングとデザインの両面からプロダクトを磨き上げることを得意としています。
+          </p>
+          <p>
+            社外では OSS 活動や技術同人誌の執筆、AI 勉強会での登壇なども積極的に行っています。
+          </p>
+          <div style="margin-top:2rem;">
+            <a href="mailto:ayumi@example.com" class="btn btn-primary">お問い合わせ</a>
+          </div>
+        </div>
+
+        <div class="fade-in" style="transition-delay:.15s">
+          <div class="skills-title">テクノロジースタック</div>
+          <div class="skills">
+            <span class="skill">Python</span>
+            <span class="skill">PyTorch</span>
+            <span class="skill">LangChain</span>
+            <span class="skill">RAG</span>
+            <span class="skill">Fine-tuning</span>
+            <span class="skill">FastAPI</span>
+            <span class="skill">Docker</span>
+            <span class="skill">AWS</span>
+            <span class="skill">GCP</span>
+            <span class="skill">Kubernetes</span>
+            <span class="skill">MLflow</span>
+            <span class="skill">React</span>
+          </div>
+
+          <div class="skills-title" style="margin-top: 1.2rem;">専門領域</div>
+          <div class="skills">
+            <span class="skill">LLM プロダクト開発</span>
+            <span class="skill">Computer Vision</span>
+            <span class="skill">時系列予測</span>
+            <span class="skill">音声処理</span>
+            <span class="skill">MLOps 基盤設計</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ════ Works セクション ════ -->
+  <section id="works" class="section">
+    <div class="section-wrap">
+
+      <div class="section-header fade-in">
+        <span class="section-eyebrow">Portfolio</span>
+        <h2 class="section-title">実績・プロジェクト</h2>
+        <div class="section-divider"></div>
+      </div>
+
+      <div class="works-grid" id="worksGrid">
+        <!-- JS で動的生成 -->
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ════ フッター ════ -->
+  <footer>
+    <div class="footer-inner">
+
+      <!-- SNS アイコン -->
+      <div class="footer-sns">
+        <span class="footer-sns-label">Follow Me</span>
+        <div class="sns-icons">
+
+          <!-- YouTube -->
+          <a class="sns-btn youtube" href="https://www.youtube.com/" target="_blank" rel="noopener" aria-label="YouTube">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+            </svg>
+          </a>
+
+          <!-- X (Twitter) -->
+          <a class="sns-btn x-twitter" href="https://x.com/" target="_blank" rel="noopener" aria-label="X (Twitter)">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/>
+            </svg>
+          </a>
+
+          <!-- Instagram -->
+          <a class="sns-btn instagram" href="https://www.instagram.com/" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+          </a>
+
+        </div>
+      </div>
+
+      <!-- 下段: コピーライト + リンク -->
+      <div class="footer-bottom">
+        <p class="footer-copy">© 2026 玉置 彩奈. All rights reserved.</p>
+        <nav class="footer-links">
+          <a class="footer-link" href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
+          <a class="footer-link" href="https://linkedin.com/" target="_blank" rel="noopener">LinkedIn</a>
+        </nav>
+      </div>
+
+    </div>
+  </footer>
+
+  <script>
+    // ── ヘッダー: スクロールで backdrop-blur 切替 ──
+    const header = document.getElementById('siteHeader');
+    window.addEventListener('scroll', () => {
+      header.classList.toggle('scrolled', window.scrollY > 50);
+    }, { passive: true });
+
+    // ── スクロールフェードイン (IntersectionObserver) ──
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: .12 });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    // ── Works カード データ ──
+    const works = [
+      {
+        icon: '🤖',
+        title: '社内チャットボット構築',
+        desc: '社内ナレッジベースを対象とした RAG パイプラインを設計・実装。GPT-4 + LangChain で構築し、問い合わせ対応工数を 40% 削減。',
+        tags: ['LLM', 'RAG', 'LangChain', 'FastAPI', 'Azure'],
+      },
+      {
+        icon: '👁️',
+        title: '画像異常検知システム',
+        desc: '製造ラインの外観検査を自動化。ResNet ベースの分類モデルと GradCAM による可視化を組み合わせ、検出精度 98.5% を達成。',
+        tags: ['Computer Vision', 'PyTorch', 'ResNet', 'Docker', 'AWS'],
+      },
+      {
+        icon: '📈',
+        title: '需要予測モデル',
+        desc: '小売業向け SKU 別需要予測システムを開発。LSTM・Transformer・Prophet を比較検証し、MAPE 8.2% の予測精度を実現。',
+        tags: ['時系列', 'LSTM', 'Transformer', 'MLflow', 'GCP'],
+      },
+      {
+        icon: '🎙️',
+        title: '音声感情分析 API',
+        desc: 'コールセンター向けのリアルタイム音声感情分析 API を構築。Whisper でテキスト変換後、Fine-tuning した分類モデルで感情を推定。',
+        tags: ['Whisper', 'Fine-tuning', 'FastAPI', 'Kubernetes', 'Python'],
+      },
+    ];
+
+    // ── Works カード 動的生成 ──
+    const grid = document.getElementById('worksGrid');
+    works.forEach((w, i) => {
+      const card = document.createElement('article');
+      card.className = 'work-card fade-in';
+      card.style.transitionDelay = `${i * .1}s`;
+      card.innerHTML = `
+        <div class="card-icon">${w.icon}</div>
+        <h3 class="card-title">${w.title}</h3>
+        <p class="card-desc">${w.desc}</p>
+        <div class="card-tags">
+          ${w.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+        </div>
+      `;
+      grid.appendChild(card);
+      observer.observe(card);
+    });
+  </script>
+</body>
+</html>
